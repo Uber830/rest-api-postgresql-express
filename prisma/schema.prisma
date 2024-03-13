@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuarios {
+  id_user     Int             @id @default(autoincrement())
+  username    String          @unique
+  avatar_url  String?         @default("https://acortar.link/49WJnw") // Si no se especifica un avatar, se asigna uno por defecto
+  email       String          @unique
+  password    String
+  created_at  DateTime?       @default(now())
+  updated_at  DateTime?       @updatedAt
+  Publicacion Publicaciones[]
+  Comentario  Comentarios[] // 1 - * Un usuario puede tener muchos comentarios
+  Likes       Likes[] // 1 - * Un usuario puede dar muchos likes
+  Role        Role            @relation(fields: [roleId_role], references: [id_role]) // * - 1 Muchos usuarios pueden tener un rol
+  roleId_role Int
+  login       login[] // 1 - * Un usuario puede tener muchos logins
+}
+
+model Publicaciones {
+  id_post    Int           @id @default(autoincrement())
+  title      String
+  content    String
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
+  id_user    Int           @unique
+  user       Usuarios      @relation(fields: [id_user], references: [id_user]) // * - 1 Muchas publicaciones pueden tener un usuario
+  Comentario Comentarios[] // 1 - * Una publicación puede tener muchos comentarios
+  Likes      Likes[] // 1 - * Una publicación puede tener muchos likes
+}
+
+model Comentarios {
+  id_comment Int           @id @default(autoincrement())
+  content    String
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
+  id_user    Int
+  id_post    Int
+  user       Usuarios      @relation(fields: [id_user], references: [id_user]) // * - 1 Muchos comentarios pueden tener un usuario
+  post       Publicaciones @relation(fields: [id_post], references: [id_post]) // * - 1 Muchos comentarios pueden tener una publicación
+}
+
+model Likes {
+  id_like    Int           @id @default(autoincrement())
+  id_user    Int
+  id_post    Int
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
+  user       Usuarios      @relation(fields: [id_user], references: [id_user]) // * - 1 Muchos likes pueden tener un usuario
+  post       Publicaciones @relation(fields: [id_post], references: [id_post]) // * - 1 Muchos likes pueden tener una publicación
+}
+
+model Role {
+  id_role                 Int              @id @default(autoincrement())
+  role                    String
+  created_at              DateTime?        @default(now())
+  updated_at              DateTime?        @updatedAt
+  user                    Usuarios[] // 1 - * Un rol puede tener muchos usuarios
+  Permission              Permission       @relation(fields: [permissionId_permission], references: [id_permission])
+  permissionId_permission Int
+  RolePermission          RolePermission[] // 1 - * Un rol puede tener muchos permisos
+}
+
+model Permission {
+  id_permission  Int              @id @default(autoincrement())
+  permission     String
+  created_at     DateTime?        @default(now())
+  updated_at     DateTime?        @updatedAt
+  role           Role[]
+  RolePermission RolePermission[]
+}
+
+model RolePermission {
+  id_role_permission Int        @id @default(autoincrement())
+  id_role            Int
+  id_permission      Int
+  created_at         DateTime?  @default(now())
+  updated_at         DateTime?  @updatedAt
+  role               Role       @relation(fields: [id_role], references: [id_role])
+  permission         Permission @relation(fields: [id_permission], references: [id_permission])
+}
+
+model login {
+  id_login   Int      @id @default(autoincrement())
+  id_user    Int
+  created_at DateTime @default(now())
+  user       Usuarios @relation(fields: [id_user], references: [id_user]) // * - 1 Muchos logins pueden tener un usuario
+}
