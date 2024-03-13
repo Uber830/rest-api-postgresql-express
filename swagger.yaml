@@ -1,0 +1,577 @@
+openapi: 3.0.3
+info:
+  title: API RESTful with Node.js - Express - PostgreSQL - OpenAPI 3.0.3
+  description: |-
+    <h4> This is an API for managing users with Node.js, Express, and PostgreSQL. It provides endpoints to create, retrieve, update, and delete user records. The API follows the OpenAPI 3.0.3 specification.<h4>
+  version: 1.0.0
+servers:
+  - url: "http://localhost:3010/"
+    description: Servidor local
+tags:
+  - name: Usuarios
+    description: Endpoints relacionados el manejo de usuarios
+  - name: Roles
+    description: Endpoints relacionados el manejo de roles
+  - name: Permisos
+    description: Endpoints relacionados el manejo de permisos
+
+paths:
+  /users:
+    get:
+      summary: Obtener todos los usuarios
+      description: Retorna un arreglo con todos los usuarios registrados en la base de datos.
+      operationId: getUsers
+      tags:
+        - Usuarios
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Error interno del servidor
+
+    post:
+      summary: Crear un nuevo usuario
+      description: Crea un nuevo usuario en la base de datos.
+      operationId: createUser
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                avatar_url:
+                  type: string
+                  default: "https://acortar.link/49WJnw"
+                email:
+                  type: string
+                password:
+                  type: string
+                roleId_role:
+                  type: integer
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Error interno del servidor
+
+  /users/{id}:
+    get:
+      summary: Obtener un usuario por ID
+      description: Retorna un usuario por su ID.
+      operationId: getUserById
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Error interno del servidor
+
+    put:
+      summary: Actualizar un usuario por ID
+      description: Actualiza un usuario por su ID.
+      operationId: updateUser
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                avatar_url:
+                  type: string
+                  default: "https://acortar.link/49WJnw"
+                email:
+                  type: string
+                password:
+                  type: string
+                roleId_role:
+                  type: integer
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Error interno del servidor
+
+    delete:
+      summary: Eliminar un usuario por ID
+      description: Elimina un usuario por su ID.
+      operationId: deleteUser
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          description: ID del usuario a eliminar
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Error interno del servidor
+
+  /roles:
+    get:
+      summary: Obtener todos los roles
+      description: Retorna un arreglo con todos los roles registrados en la base de datos.
+      operationId: getRoles
+      tags:
+        - Roles
+      responses:
+        "200":
+          description: Obtener todos los roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_role:
+                      type: integer
+                      example: 1
+                    role:
+                      type: string
+                      example: "usuario"
+                    permissionId_permission:
+                      type: integer
+                      example: 1
+                    createdAt:
+                      type: string
+                      example: "2024-03-11T04:28:09.523Z"
+                    updatedAt:
+                      type: string
+                      example: "2024-03-11T04:28:09.523Z"
+            text/plain:
+              schema:
+                type: string
+                example: { message: "No se encontraron roles" }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error en el servidor al obtener los roles" }
+
+    post:
+      summary: Crear un nuevo rol
+      description: Crea un nuevo rol en la base de datos.
+      operationId: createRole
+      tags:
+        - Roles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  example: "usuario"
+                permissionId_permission:
+                  type: integer
+                  example: 1
+      responses:
+        "200":
+          description: Permiso creado
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "Rol creado correctamente" }
+        "400":
+          description: Error en la solicitud
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { message: "El permiso con el ID proporcionado no existe" }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error en el servidor al crear el rol" }
+
+  /roles/{id}:
+    get:
+      summary: Obtener un rol por ID
+      description: Retorna un rol por su ID.
+      operationId: getRoleById
+      tags:
+        - Roles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Obtener un rol por ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_role:
+                    type: integer
+                    example: 1
+                  role:
+                    type: string
+                    example: "usuario"
+                  permissionId_permission:
+                    type: integer
+                    example: 1
+                  createdAt:
+                    type: string
+                    example: "2024-03-11T04:28:09.523Z"
+                  updatedAt:
+                    type: string
+                    example: "2024-03-11T04:28:09.523Z"
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { message: "No se encontró el rol con el ID proporcionado" }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error en el servidor al obtener el rol" }
+
+    put:
+      summary: Actualizar un rol por ID
+      description: Actualiza un rol por su ID.
+      operationId: updateRole
+      tags:
+        - Roles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                permissionId_permission:
+                  type: integer
+      responses:
+        "200":
+          description: Rol actualizado
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "Rol actualizado correctamente" }
+        "400":
+          description: Error en la solicitud
+          content:
+            text/plain:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      roleMessage:
+                        type: string
+                        example: "El rol con el ID proporcionado no existe"
+                      permissionMessage:
+                        type: string
+                        example: "El permiso con el ID proporcionado no existe"
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "El rol o el permiso con el ID proporcionado no existen"
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error en el servidor al actualizar el rol" }
+
+    delete:
+      summary: Eliminar un rol por ID
+      description: Elimina un rol por su ID.
+      operationId: deleteRole
+      tags:
+        - Roles
+      parameters:
+        - name: id
+          in: path
+          description: ID del rol a eliminar
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Eliminar un rol por su ID
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "Rol eliminado correctamente" }
+        "400":
+          description: Error en la solicitud
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { message: "El rol con el ID proporcionado no existe" }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error en el servidor al eliminar el rol" }
+  /permission:
+    get:
+      summary: Obtener todos los permisos
+      description: Retorna un arreglo con todos los permisos registrados en la base de datos.
+      operationId: getPermission
+      tags:
+        - Permisos
+      responses:
+        "200":
+          description: Usuarios encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_permission:
+                      type: integer
+                      example: 1
+                    permission:
+                      type: string
+                      example: "usuario:crear"
+                    createdAt:
+                      type: string
+                      example: "2024-03-11T04:28:09.523Z"
+                    updatedAt:
+                      type: string
+                      example: "2024-03-11T04:28:09.523Z"
+            text/plain:
+              schema:
+                type: string
+                example: { message: "No se encontraron permisos" }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { error: "Error en el servidor al obtener los permisos" }
+
+    post:
+      tags:
+        - Permisos
+      summary: Crear un nuevo permiso
+      description: Crea un nuevo permiso en la base de datos.
+      operationId: createPermission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permission:
+                  type: string
+                  example: "usuario:crear"
+      responses:
+        "201":
+          description:
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "Permiso creado correctamente" }
+        # "400":
+        #   description: Error en la solicitud
+        #   content:
+        #     text/plain:
+        #       schema:
+        #         type: string
+        #         example:
+        #           { message: "Error en la solicitud al crear el permiso" }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error en el servidor al crear el permiso" }
+
+  /permission/{id}:
+    get:
+      summary: Obtener un permiso por ID
+      description: Retorna un permiso por su ID.
+      operationId: getPermissionById
+      tags:
+        - Permisos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Obtener un permiso por ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_permission:
+                    type: integer
+                    example: 1
+                  permission:
+                    type: string
+                    example: "usuario:crear"
+                  createdAt:
+                    type: string
+                    example: "2024-03-11T04:28:09.523Z"
+                  updatedAt:
+                    type: string
+                    example: "2024-03-11T04:28:09.523Z"
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { message: "No se encontró el permiso con el ID proporcionado", }
+
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error en el servidor al obtener el permiso" }
+
+    put:
+      summary: Actualizar un permiso por ID
+      description: Actualiza un permiso por su ID.
+      operationId: updatePermission
+      tags:
+        - Permisos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permission:
+                  type: string
+                  example: "usuario:crear"
+      responses:
+        "200":
+          description: Permiso actualizado
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "Permiso actualizado correctamente" }
+        "400":
+          description: Error en la solicitud
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { message: "El permiso con el ID proporcionado no existe" }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { error: "Error en el servidor al actualizar el permiso" }
+
+    delete:
+      summary: Eliminar un permiso por ID
+      description: Elimina un permiso por su ID.
+      operationId: deletePermission
+      tags:
+        - Permisos
+      parameters:
+        - name: id
+          in: path
+          description: ID del permiso a eliminar
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Permiso eliminado
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "Permiso eliminado correctamente" }
+        "400":
+          description: Error en la solicitud
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { message: "El permiso con el ID proporcionado no existe" }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { error: "Error en el servidor al eliminar el permiso" }
