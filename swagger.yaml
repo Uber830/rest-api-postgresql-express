@@ -14,6 +14,8 @@ tags:
     description: Endpoints relacionados el manejo de roles
   - name: Permisos
     description: Endpoints relacionados el manejo de permisos
+  - name: Relación roles-permisos
+    description: Endpoints relacionados el manejo de la relación entre roles y permisos
 
 paths:
   /users:
@@ -481,7 +483,9 @@ paths:
               schema:
                 type: string
                 example:
-                  { message: "No se encontró el permiso con el ID proporcionado", }
+                  {
+                    message: "No se encontró el permiso con el ID proporcionado",
+                  }
 
         "500":
           description: Error interno del servidor
@@ -575,3 +579,205 @@ paths:
                 type: string
                 example:
                   { error: "Error en el servidor al eliminar el permiso" }
+  /rolePermission:
+    get:
+      summary: Obtener todos los permisos de roles
+      description: Obtiene todos los permisos de roles.
+      operationId: getRolePermission
+      tags:
+        - Relación roles-permisos
+      responses:
+        "200":
+          description: Permisos de roles obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  permissions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        permission:
+                          type: string
+                          example: "usuario:crear"
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  {
+                    error: "Error en el servidor al obtener los permisos de roles",
+                  }
+
+    post:
+      summary: Crear un nuevo permiso de rol
+      description: Crea un nuevo permiso de rol.
+      operationId: createRolePermission
+      tags:
+        - Relación roles-permisos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permission:
+                  type: string
+                  example: "usuario:crear"
+      responses:
+        "201":
+          description: Permiso de rol creado correctamente
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "Permiso de rol creado correctamente" }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { error: "Error en el servidor al crear el permiso de rol" }
+
+  /rolePermission/{id}:
+    get:
+      summary: Obtener un permiso de rol por ID
+      description: Obtiene un permiso de rol por su ID.
+      operationId: getRolePermissionById
+      tags:
+        - Relación roles-permisos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Permiso de rol obtenido correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  permission:
+                    type: string
+                    example: "usuario:crear"
+        "400":
+          description: Error en la solicitud
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  {
+                    message: "El permiso de rol con el ID proporcionado no existe",
+                  }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { error: "Error en el servidor al obtener el permiso de rol" }
+
+    put:
+      summary: Actualizar un permiso de rol por ID
+      description: Actualiza un permiso de rol por su ID.
+      operationId: updateRolePermission
+      tags:
+        - Relación roles-permisos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permission:
+                  type: string
+                  example: "usuario:crear"
+      responses:
+        "200":
+          description: Permiso de rol actualizado correctamente
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "Permiso de rol actualizado correctamente" }
+        "400":
+          description: Error en la solicitud
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  {
+                    message: "El permiso de rol con el ID proporcionado no existe",
+                  }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  {
+                    error: "Error en el servidor al actualizar el permiso de rol",
+                  }
+
+    delete:
+      summary: Eliminar un permiso de rol por ID
+      description: Elimina un permiso de rol por su ID.
+      operationId: deleteRolePermission
+      tags:
+        - Relación roles-permisos
+      parameters:
+        - name: id
+          in: path
+          description: ID del permiso de rol a eliminar
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Permiso de rol eliminado correctamente
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "Permiso de rol eliminado correctamente" }
+        "400":
+          description: Error en la solicitud
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  {
+                    message: "El permiso de rol con el ID proporcionado no existe",
+                  }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  {
+                    error: "Error en el servidor al eliminar el permiso de rol",
+                  }

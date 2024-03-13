@@ -9,6 +9,7 @@ import yml from "yaml"
 import { routerUser } from "./router/users.js";
 import { routerRole } from "./router/role.js";
 import { routerPermission } from "./router/permission.js";
+import { routerRolePermission } from "./router/rolePermission.js";
 
 const app = Express();
 
@@ -25,6 +26,7 @@ const swaggerDocument = yml.parse(file)
 app.use(routerUser);
 app.use(routerRole);
 app.use(routerPermission);
+app.use(routerRolePermission);
 
 // Swagger UI Routes
 app.use("/docs", serve, setup(swaggerDocument));
