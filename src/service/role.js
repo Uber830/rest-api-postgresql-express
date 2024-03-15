@@ -21,10 +21,10 @@ const getRoleByIdService = async (id) => {
   return role;
 };
 
-const updateRoleService = async (id, role, permission) => {
+const updateRoleService = async (id, role) => {
   const roleUpdate = await prisma.role.update({
     where: { id_role: parseInt(id) },
-    data: { role: role, permissionId_permission: permission },
+    data: { role: role },
   });
   return roleUpdate;
 };

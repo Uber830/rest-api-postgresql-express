@@ -5,7 +5,6 @@ import {
   updateRoleService,
   deleteRoleService,
 } from "../service/role.js";
-import { getPermissionByIdService } from "../service/permission.js";
 
 const getRoles = async (req, res) => {
   try {
@@ -25,17 +24,8 @@ const getRoles = async (req, res) => {
 
 const createRoles = async (req, res) => {
   try {
-    const { role, permissionId_permission: permission } = req.body;
-
-    // Verifica si el permiso con el ID proporcionado existe
-    const permissionExist = await getPermissionByIdService(permission);
-    if (!permissionExist) {
-      return res
-        .status(400)
-        .json({ message: "El permiso con el ID proporcionado no existe" });
-    }
-
-    await createRoleService(role, permission);
+    const { role } = req.body;
+    await createRoleService(role);
 
     res.status(201).json({ result: "Rol creado correctamente!" });
   } catch (error) {
@@ -63,7 +53,7 @@ const getRoleById = async (req, res) => {
 const updateRole = async (req, res) => {
   try {
     const { id } = req.params;
-    const { role, permissionId_permission: permission } = req.body;
+    const { role } = req.body;
 
     // Verifica si el rol con el ID proporcionado existe
     const roleExist = await getRoleByIdService(id);
@@ -73,15 +63,7 @@ const updateRole = async (req, res) => {
         .json({ message: "El rol con el ID proporcionado no existe" });
     }
 
-    // Verifica si el permiso con el ID proporcionado existe
-    const permissionExist = await getPermissionByIdService(permission);
-    if (!permissionExist) {
-      return res
-        .status(400)
-        .json({ message: "El permiso con el ID proporcionado no existe" });
-    }
-
-    await updateRoleService(id, role, permission);
+    await updateRoleService(id, role);
 
     res.status(200).json({ result: "Rol actualizado correctamente!" });
   } catch (error) {
