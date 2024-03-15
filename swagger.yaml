@@ -158,9 +158,6 @@ paths:
                     role:
                       type: string
                       example: "usuario"
-                    permissionId_permission:
-                      type: integer
-                      example: 1
                     createdAt:
                       type: string
                       example: "2024-03-11T04:28:09.523Z"
@@ -195,9 +192,6 @@ paths:
                 role:
                   type: string
                   example: "usuario"
-                permissionId_permission:
-                  type: integer
-                  example: 1
       responses:
         "200":
           description: Permiso creado
@@ -206,14 +200,6 @@ paths:
               schema:
                 type: string
                 example: { result: "Rol creado correctamente" }
-        "400":
-          description: Error en la solicitud
-          content:
-            text/plain:
-              schema:
-                type: string
-                example:
-                  { message: "El permiso con el ID proporcionado no existe" }
         "500":
           description: Error interno del servidor
           content:
@@ -249,9 +235,6 @@ paths:
                   role:
                     type: string
                     example: "usuario"
-                  permissionId_permission:
-                    type: integer
-                    example: 1
                   createdAt:
                     type: string
                     example: "2024-03-11T04:28:09.523Z"
@@ -292,8 +275,6 @@ paths:
               properties:
                 role:
                   type: string
-                permissionId_permission:
-                  type: integer
       responses:
         "200":
           description: Rol actualizado
@@ -307,20 +288,14 @@ paths:
           content:
             text/plain:
               schema:
-                oneOf:
-                  - type: object
-                    properties:
-                      roleMessage:
-                        type: string
-                        example: "El rol con el ID proporcionado no existe"
-                      permissionMessage:
-                        type: string
-                        example: "El permiso con el ID proporcionado no existe"
-                  - type: object
-                    properties:
-                      message:
-                        type: string
-                        example: "El rol o el permiso con el ID proporcionado no existen"
+                  type: object
+                  properties:
+                    roleMessage:
+                      type: string
+                      example: "El rol con el ID proporcionado no existe"
+                    permissionMessage:
+                      type: string
+                      example: "El permiso con el ID proporcionado no existe"
         "500":
           description: Error interno del servidor
           content:
@@ -592,16 +567,31 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  permissions:
-                    type: array
-                    items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_role_permission:
+                      type: integer
+                      example: 1
+                    role:
                       type: object
                       properties:
+                        id_role:
+                          type: integer
+                          example: 8
+                        role:
+                          type: string
+                          example: "Administrador"
+                    permission:
+                      type: object
+                      properties:
+                        id_permission:
+                          type: integer
+                          example: 4
                         permission:
                           type: string
-                          example: "usuario:crear"
+                          example: "usuario:Escritura"
         "500":
           description: Error interno del servidor
           content:
@@ -626,9 +616,14 @@ paths:
             schema:
               type: object
               properties:
-                permission:
-                  type: string
-                  example: "usuario:crear"
+                id_role:
+                  type: integer
+                  example: 1
+                id_permission:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1]
       responses:
         "201":
           description: Permiso de rol creado correctamente
@@ -667,9 +662,35 @@ paths:
               schema:
                 type: object
                 properties:
+                  id_role_permission:
+                    type: integer
+                    example: 5
+                  role:
+                    type: object
+                    properties:
+                      id_role:
+                        type: integer
+                        example: 8
+                      role:
+                        type: string
+                        example: "Administrador"
                   permission:
+                    type: object
+                    properties:
+                      id_permission:
+                        type: integer
+                        example: 6
+                      permission:
+                        type: string
+                        example: "usuario:Modificación"
+                  created_at:
                     type: string
-                    example: "usuario:crear"
+                    format: date-time
+                    example: "2024-03-14T04:04:03.150Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2024-03-14T04:04:03.150Z"
         "400":
           description: Error en la solicitud
           content:
@@ -708,9 +729,12 @@ paths:
             schema:
               type: object
               properties:
-                permission:
-                  type: string
-                  example: "usuario:crear"
+                id_role:
+                  type: integer
+                  example: 1
+                id_permission:
+                  type: integer
+                  example: 1
       responses:
         "200":
           description: Permiso de rol actualizado correctamente
@@ -780,4 +804,66 @@ paths:
                 example:
                   {
                     error: "Error en el servidor al eliminar el permiso de rol",
+                  }
+  /rolePermission/role/{id}:
+    get:
+      summary: Obtener todos los permisos de un rol
+      description: Obtiene todos los permisos de un rol.
+      operationId: getRolePermissionByRole
+      tags:
+        - Relación roles-permisos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Permisos de rol obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_role_permission:
+                      type: integer
+                      example: 1
+                    role:
+                      type: object
+                      properties:
+                        id_role:
+                          type: integer
+                          example: 8
+                        role:
+                          type: string
+                          example: "Administrador"
+                    permission:
+                      type: object
+                      properties:
+                        id_permission:
+                          type: integer
+                          example: 4
+                        permission:
+                          type: string
+                          example: "usuario:Escritura"
+        "400":
+          description: Error en la solicitud
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { message: "El rol con el ID proporcionado no existe" }
+        "500":
+          description: Error interno del servidor
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  {
+                    error: "Error en el servidor al obtener los permisos de rol",
                   }

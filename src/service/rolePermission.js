@@ -3,13 +3,34 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const getRolePermissionService = async () => {
-  return await prisma.rolePermission.findMany();
+  return await prisma.rolePermission.findMany({
+    select: {
+      id_role_permission: true,
+      role: {
+        select: {
+          id_role: true,
+          role: true,
+        },
+      },
+      permission: {
+        select: {
+          id_permission: true,
+          permission: true,
+        },
+      },
+    },
+  });
 };
 
-const createRolePermissionService = async (rolePermission) => {
-  return await prisma.rolePermission.create({
-    data: rolePermission,
-  });
+const createRolePermissionService = async (id_role, id_permission) => {
+  for (const permissionId of id_permission) {
+    await prisma.rolePermission.create({
+      data: {
+        id_role: parseInt(id_role),
+        id_permission: parseInt(permissionId),
+      },
+    });
+  }
 };
 
 const getRolePermissionByIdService = async (id) => {
@@ -17,15 +38,56 @@ const getRolePermissionByIdService = async (id) => {
     where: {
       id_role_permission: parseInt(id),
     },
+    select: {
+      id_role_permission: true,
+      role: {
+        select: {
+          id_role: true,
+          role: true,
+        },
+      },
+      permission: {
+        select: {
+          id_permission: true,
+          permission: true,
+        },
+      },
+    },
   });
 };
 
-const updateRolePermissionService = async (id, rolePermission) => {
+const getRolePermissionByRoleIdService = async (id) => {
+  return await prisma.rolePermission.findMany({
+    where: {
+      id_role: parseInt(id),
+    },
+    select: {
+      id_role_permission: true,
+      role: {
+        select: {
+          id_role: true,
+          role: true,
+        },
+      },
+      permission: {
+        select: {
+          id_permission: true,
+          permission: true,
+        },
+      },
+    },
+  });
+};
+
+const updateRolePermissionService = async (id, id_role, id_permission) => {
   return await prisma.rolePermission.update({
     where: {
       id_role_permission: parseInt(id),
     },
-    data: rolePermission,
+    data: {
+      id_role: parseInt(id_role),
+      id_permission: parseInt(id_permission),
+    },
   });
 };
 
@@ -41,6 +103,7 @@ export {
   getRolePermissionService,
   createRolePermissionService,
   getRolePermissionByIdService,
+  getRolePermissionByRoleIdService,
   updateRolePermissionService,
   deleteRolePermissionService,
 };
