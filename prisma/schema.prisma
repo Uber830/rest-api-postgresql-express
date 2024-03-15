@@ -64,12 +64,10 @@ model Likes {
 
 model Role {
   id_role                 Int              @id @default(autoincrement())
-  role                    String
+  role                    String           @unique
   created_at              DateTime?        @default(now())
   updated_at              DateTime?        @updatedAt
   user                    Usuarios[] // 1 - * Un rol puede tener muchos usuarios
-  Permission              Permission       @relation(fields: [permissionId_permission], references: [id_permission])
-  permissionId_permission Int
   RolePermission          RolePermission[] // 1 - * Un rol puede tener muchos permisos
 }
 
@@ -78,7 +76,6 @@ model Permission {
   permission     String
   created_at     DateTime?        @default(now())
   updated_at     DateTime?        @updatedAt
-  role           Role[]
   RolePermission RolePermission[]
 }
 
