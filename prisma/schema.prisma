@@ -14,19 +14,29 @@ datasource db {
 }
 
 model Usuarios {
-  id_user     Int             @id @default(autoincrement())
-  username    String          @unique
-  avatar_url  String?         @default("https://acortar.link/49WJnw") // Si no se especifica un avatar, se asigna uno por defecto
-  email       String          @unique
-  password    String
-  created_at  DateTime?       @default(now())
-  updated_at  DateTime?       @updatedAt
-  Publicacion Publicaciones[]
-  Comentario  Comentarios[] // 1 - * Un usuario puede tener muchos comentarios
-  Likes       Likes[] // 1 - * Un usuario puede dar muchos likes
-  Role        Role            @relation(fields: [roleId_role], references: [id_role]) // * - 1 Muchos usuarios pueden tener un rol
-  roleId_role Int
-  login       login[] // 1 - * Un usuario puede tener muchos logins
+  id_user               Int                     @id @default(autoincrement())
+  username              String                  @unique
+  avatar_url            String?                 @default("https://acortar.link/49WJnw") // Si no se especifica un avatar, se asigna uno por defecto
+  email                 String                  @unique
+  password              String
+  created_at            DateTime?               @default(now())
+  updated_at            DateTime?               @updatedAt
+  Publicacion           Publicaciones[]
+  Comentario            Comentarios[] // 1 - * Un usuario puede tener muchos comentarios
+  Likes                 Likes[] // 1 - * Un usuario puede dar muchos likes
+  login                 login[] // 1 - * Un usuario puede tener muchos logins
+  UsuarioRolePermission UsuarioRolePermission[]
+}
+
+// Table to manage the relationship between users and role-permissions
+// One user can have many role-permissions and one role-permission is group of role and permission
+model UsuarioRolePermission {
+  id_user_role_permission Int            @id @default(autoincrement())
+  id_user                 Int
+  id_role_permission      Int
+  created_at              DateTime?      @default(now())
+  user                    Usuarios       @relation(fields: [id_user], references: [id_user], onUpdate: Cascade, onDelete: Cascade)
+  role_permission         RolePermission @relation(fields: [id_role_permission], references: [id_role_permission], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Publicaciones {
@@ -36,7 +46,7 @@ model Publicaciones {
   created_at DateTime      @default(now())
   updated_at DateTime      @updatedAt
   id_user    Int           @unique
-  user       Usuarios      @relation(fields: [id_user], references: [id_user]) // * - 1 Muchas publicaciones pueden tener un usuario
+  user       Usuarios      @relation(fields: [id_user], references: [id_user], onUpdate: Cascade, onDelete: Cascade) // * - 1 Muchas publicaciones pueden tener un usuario
   Comentario Comentarios[] // 1 - * Una publicación puede tener muchos comentarios
   Likes      Likes[] // 1 - * Una publicación puede tener muchos likes
 }
@@ -48,8 +58,8 @@ model Comentarios {
   updated_at DateTime      @updatedAt
   id_user    Int
   id_post    Int
-  user       Usuarios      @relation(fields: [id_user], references: [id_user]) // * - 1 Muchos comentarios pueden tener un usuario
-  post       Publicaciones @relation(fields: [id_post], references: [id_post]) // * - 1 Muchos comentarios pueden tener una publicación
+  user       Usuarios      @relation(fields: [id_user], references: [id_user], onUpdate: Cascade, onDelete: Cascade) // * - 1 Muchos comentarios pueden tener un usuario
+  post       Publicaciones @relation(fields: [id_post], references: [id_post], onUpdate: Cascade, onDelete: Cascade) // * - 1 Muchos comentarios pueden tener una publicación
 }
 
 model Likes {
@@ -58,19 +68,22 @@ model Likes {
   id_post    Int
   created_at DateTime      @default(now())
   updated_at DateTime      @updatedAt
-  user       Usuarios      @relation(fields: [id_user], references: [id_user]) // * - 1 Muchos likes pueden tener un usuario
-  post       Publicaciones @relation(fields: [id_post], references: [id_post]) // * - 1 Muchos likes pueden tener una publicación
+  user       Usuarios      @relation(fields: [id_user], references: [id_user], onUpdate: Cascade, onDelete: Cascade) // * - 1 Muchos likes pueden tener un usuario
+  post       Publicaciones @relation(fields: [id_post], references: [id_post], onUpdate: Cascade, onDelete: Cascade) // * - 1 Muchos likes pueden tener una publicación
 }
 
+// Table to manage the roles of the application
+// how admin, user, etc
 model Role {
-  id_role                 Int              @id @default(autoincrement())
-  role                    String           @unique
-  created_at              DateTime?        @default(now())
-  updated_at              DateTime?        @updatedAt
-  user                    Usuarios[] // 1 - * Un rol puede tener muchos usuarios
-  RolePermission          RolePermission[] // 1 - * Un rol puede tener muchos permisos
+  id_role        Int              @id @default(autoincrement())
+  role           String           @unique
+  created_at     DateTime?        @default(now())
+  updated_at     DateTime?        @updatedAt
+  RolePermission RolePermission[] // 1 - * Un rol puede tener muchos permisos
 }
 
+// Table to manage the permissions of the application
+// how to create, read, update and delete
 model Permission {
   id_permission  Int              @id @default(autoincrement())
   permission     String
@@ -79,19 +92,23 @@ model Permission {
   RolePermission RolePermission[]
 }
 
+// Table to manage the relationship between roles and permissions
+// This table is used to assign permissions to roles
 model RolePermission {
-  id_role_permission Int        @id @default(autoincrement())
-  id_role            Int
-  id_permission      Int
-  created_at         DateTime?  @default(now())
-  updated_at         DateTime?  @updatedAt
-  role               Role       @relation(fields: [id_role], references: [id_role])
-  permission         Permission @relation(fields: [id_permission], references: [id_permission])
+  id_role_permission    Int                     @id @default(autoincrement())
+  id_role               Int
+  id_permission         Int
+  created_at            DateTime?               @default(now())
+  updated_at            DateTime?               @updatedAt
+  role                  Role                    @relation(fields: [id_role], references: [id_role], onUpdate: Cascade, onDelete: Cascade)
+  permission            Permission              @relation(fields: [id_permission], references: [id_permission], onUpdate: Cascade, onDelete: Cascade)
+  UsuarioRolePermission UsuarioRolePermission[]
 }
 
+// Table to manage control of user logins to the application
 model login {
   id_login   Int      @id @default(autoincrement())
   id_user    Int
   created_at DateTime @default(now())
-  user       Usuarios @relation(fields: [id_user], references: [id_user]) // * - 1 Muchos logins pueden tener un usuario
+  user       Usuarios @relation(fields: [id_user], references: [id_user], onUpdate: Cascade, onDelete: Cascade) // * - 1 Muchos logins pueden tener un usuario
 }
