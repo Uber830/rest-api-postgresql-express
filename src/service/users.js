@@ -2,44 +2,132 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-
 const getUserService = async () => {
-  return await prisma.user.findMany();
-};
-
-const getUserByIdService = async (id) => {
-  return await prisma.user.findUnique({
-    where: {
-      id: parseInt(id),
+  return await prisma.usuarios.findMany({
+    select: {
+      id_user: true,
+      username: true,
+      avatar_url: true,
+      email: true,
+      created_at: true,
+      updated_at: true,
     },
   });
 };
 
-const createUserService = async (data) => {
-  return await prisma.user.create({
+const getUserByIdService = async (id) => {
+  return await prisma.usuarios.findUnique({
+    where: {
+      id_user: parseInt(id),
+    },
+    select: {
+      id_user: true,
+      username: true,
+      avatar_url: true,
+      email: true,
+      created_at: true,
+      updated_at: true,
+    },
+  });
+};
+
+const getUserByIdAllInfoService = async (id) => {
+  return await prisma.usuarios.findMany({
+    where: {
+      id_user: parseInt(id),
+    },
+    select: {
+      id_user: true,
+      username: true,
+      avatar_url: true,
+      email: true,
+      created_at: true,
+      updated_at: true,
+      UsuarioRolePermission: {
+        select: {
+          id_role_permission: true,
+          role_permission: {
+            select: {
+              role: {
+                select: {
+                  id_role: true,
+                  role: true,
+                },
+              },
+              permission: {
+                select: {
+                  id_permission: true,
+                  permission: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
+const createUserService = async ( username, avatar_url, email, password, role_permission ) => {
+  // Create a new user and return the user without the password
+  return await prisma.usuarios.create({
     data: {
-      ...data,
+      username: username,
+      avatar_url: avatar_url,
+      email: email,
+      password: password,
+      UsuarioRolePermission: {
+        create: role_permission.map((id) => ({
+          id_role_permission: id,
+        })),
+      },
+    },
+    select: {
+      id_user: true,
+      username: true,
+      avatar_url: true,
+      email: true,
+      password: false,
+      created_at: true,
+      updated_at: true,
     },
   });
 };
 
 const deleteUserService = async (id) => {
-  return await prisma.user.delete({
+  await prisma.usuarios.delete({
     where: {
-      id: parseInt(id),
+      id_user: parseInt(id),
     },
   });
 };
 
-const updateUserService = async (id, data) => {
-  return await prisma.user.update({
+const updateUserService = async (id, username, avatar_url, email, password) => {
+  // User to update
+  const currentUser = await prisma.usuarios.findUnique({
     where: {
-      id: parseInt(id),
+      id_user: parseInt(id),
+    },
+  });
+
+  await prisma.usuarios.update({
+    where: {
+      id_user: parseInt(id),
     },
     data: {
-      ...data,
+      username: username !== undefined ? username : currentUser.username,
+      avatar_url: avatar_url !== undefined ? avatar_url : currentUser.avatar_url,
+      email: email !== undefined ? email : currentUser.email,
+      password: password !== undefined ? password : currentUser.password,
     },
   });
 };
 
-export { getUserService, getUserByIdService, createUserService, deleteUserService, updateUserService };
+export {
+  getUserService,
+  getUserByIdService,
+  getUserByIdAllInfoService,
+  createUserService,
+  deleteUserService,
+  updateUserService,
+};
