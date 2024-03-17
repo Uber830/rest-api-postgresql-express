@@ -27,9 +27,39 @@ paths:
         - Usuarios
       responses:
         "200":
-          description: OK
+          description: Get all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_user:
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: "usuario"
+                    avatar_url:
+                      type: string
+                      default: "https://acortar.link/49WJnw"
+                    email:
+                      type: string
+                      example: "usuario@ejemplo.com"
+                    created_at:
+                      type: string
+                      example: "2024-03-16T22:27:02.211Z"
+                    update_at:
+                      type: string
+                      example: "2024-03-17T02:25:41.182Z"
         "500":
-          description: Error interno del servidor
+          description: Error in the server
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error in the server to get the users" }
 
     post:
       summary: Crear un nuevo usuario
@@ -46,20 +76,37 @@ paths:
               properties:
                 username:
                   type: string
+                  example: "usuario"
                 avatar_url:
                   type: string
                   default: "https://acortar.link/49WJnw"
                 email:
                   type: string
+                  example: "correo@ejemplo.com"
                 password:
                   type: string
-                roleId_role:
-                  type: integer
+                  example: "contraseñaSegura"
+                role_permission_array:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1, 2]
+
       responses:
         "200":
-          description: OK
+          description: Created a new user
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "User created successfully!" }
         "500":
-          description: Error interno del servidor
+          description: Error in the server
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error in the server to create the user" }
 
   /users/{id}:
     get:
@@ -76,9 +123,44 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Get a user by ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_user:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: "usuario"
+                  avatar_url:
+                    type: string
+                    default: "https://acortar.link/49WJnw"
+                  email:
+                    type: string
+                    example: "usuario@ejemplo.com"
+                  created_at:
+                    type: string
+                    example: "2024-03-16T22:27:02.211Z"
+                  update_at:
+                    type: string
+                    example: "2024-03-17T02:25:41.182Z"
+        "400":
+          description: Error in the request
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { message: "This id does not exist in the DB" }
         "500":
-          description: Error interno del servidor
+          description: Error in the server
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error in the server to get the user" }
 
     put:
       summary: Actualizar un usuario por ID
@@ -101,20 +183,33 @@ paths:
               properties:
                 username:
                   type: string
+                  example: "usuario"
                 avatar_url:
                   type: string
                   default: "https://acortar.link/49WJnw"
                 email:
                   type: string
+                  example: "usuario@ejemplo.com"
                 password:
                   type: string
-                roleId_role:
-                  type: integer
+                  example: "contraseñaSegura"
+
       responses:
         "200":
-          description: OK
+          description: User updated successfully!
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "Usuario actualizado correctamente" }
         "500":
-          description: Error interno del servidor
+          description: Error in the server
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { error: "Error en el servidor al actualizar el usuario" }
 
     delete:
       summary: Eliminar un usuario por ID
@@ -131,9 +226,112 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: User deleted successfully!
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { result: "User deleted successfully!" }
         "500":
-          description: Error interno del servidor
+          description: Error in the server
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { error: "Error in the server to delete the user" }
+        "400":
+          description: Error in the request
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { message: "This id does not exist in the DB" }
+
+  /users/{id}/allinfo:
+    get:
+      summary: Obtener toda la información de un usuario por ID
+      description: Retorna toda la información de un usuario por su ID incluyendo sus roles y permisos.
+      operationId: getUserByIdAllInfo
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Get all the user info by ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_user:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: "usuario"
+                  avatar_url:
+                    type: string
+                    example: "https://acortar.link/49WJnw"
+                  email:
+                    type: string
+                    example: "usuario@ejemplo.com"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2024-03-16T22:27:02.211Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2024-03-17T02:25:41.182Z"
+                  UsuarioRolePermission:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id_role_permission:
+                          type: integer
+                          example: 4
+                        role_permission:
+                          type: object
+                          properties:
+                            role:
+                              type: object
+                              properties:
+                                id_role:
+                                  type: integer
+                                  example: 9
+                                role:
+                                  type: string
+                                  example: "Usuario"
+                            permission:
+                              type: object
+                              properties:
+                                id_permission:
+                                  type: integer
+                                  example: 5
+                                permission:
+                                  type: string
+                                  example: "usuario:lectura"
+        "400":
+          description: Error in the request
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: { message: "This id does not exist in the DB" }
+        "500":
+          description: Error in the server
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  { error: "Error in the server to get all the user info" }
 
   /roles:
     get:
@@ -288,14 +486,14 @@ paths:
           content:
             text/plain:
               schema:
-                  type: object
-                  properties:
-                    roleMessage:
-                      type: string
-                      example: "El rol con el ID proporcionado no existe"
-                    permissionMessage:
-                      type: string
-                      example: "El permiso con el ID proporcionado no existe"
+                type: object
+                properties:
+                  roleMessage:
+                    type: string
+                    example: "El rol con el ID proporcionado no existe"
+                  permissionMessage:
+                    type: string
+                    example: "El permiso con el ID proporcionado no existe"
         "500":
           description: Error interno del servidor
           content:
@@ -855,8 +1053,7 @@ paths:
             text/plain:
               schema:
                 type: string
-                example:
-                  { message: "El rol con el ID proporcionado no existe" }
+                example: { message: "El rol con el ID proporcionado no existe" }
         "500":
           description: Error interno del servidor
           content:
