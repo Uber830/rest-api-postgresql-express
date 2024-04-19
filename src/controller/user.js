@@ -5,6 +5,8 @@ import {
   createUserService,
   deleteUserService,
   updateUserService,
+  addUserRoleService,
+  deleteUserRoleService,
 } from "../service/users.js";
 
 const getUsers = async (req, res) => {
@@ -13,7 +15,7 @@ const getUsers = async (req, res) => {
 
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ error: "Error in the server to get all users" });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -95,4 +97,27 @@ const deleteUser = async (req, res) => {
   }
 };
 
-export { getUsers, createUsers, getUserById, getUserByIdAllInfo, deleteUser, updateUser };
+const pushUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { id_role_permission } = req.body;
+    await addUserRoleService(id, id_role_permission);
+
+    res.status(200).json({ result: "Rol-Permiso actualizado correctamente!" });
+  } catch (error) {
+    res.status(500).json({ error: "Error in the server to update the user role" });
+  }
+};
+
+const deleteUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await deleteUserRoleService(id);
+
+    res.status(200).json({ result: "Rol-Permiso eliminado correctamente!" });
+  } catch (error) {
+    res.status(500).json({ error: "Error in the server to delete the user role" });
+  }
+};
+
+export { getUsers, createUsers, getUserById, getUserByIdAllInfo, deleteUser, updateUser, pushUserRole, deleteUserRole };

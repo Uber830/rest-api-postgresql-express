@@ -45,6 +45,7 @@ const getUserByIdAllInfoService = async (id) => {
       updated_at: true,
       UsuarioRolePermission: {
         select: {
+          id_user_role_permission: true,
           id_role_permission: true,
           role_permission: {
             select: {
@@ -123,6 +124,23 @@ const updateUserService = async (id, username, avatar_url, email, password) => {
   });
 };
 
+const addUserRoleService = async (id_user, id_role_permission) => {
+  return await prisma.usuarioRolePermission.create({
+    data: {
+      id_user: parseInt(id_user),
+      id_role_permission: parseInt(id_role_permission),
+    }
+  });
+};
+
+const deleteUserRoleService = async (id_user_role_permission) => {
+  return await prisma.usuarioRolePermission.delete({
+    where: {
+      id_user_role_permission: parseInt(id_user_role_permission),
+    }
+  });
+};
+
 export {
   getUserService,
   getUserByIdService,
@@ -130,4 +148,6 @@ export {
   createUserService,
   deleteUserService,
   updateUserService,
+  addUserRoleService,
+  deleteUserRoleService,
 };
