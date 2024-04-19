@@ -16,6 +16,7 @@ datasource db {
 model Usuarios {
   id_user               Int                     @id @default(autoincrement())
   username              String                  @unique
+  id_url                String?                 @unique
   avatar_url            String?                 @default("https://acortar.link/49WJnw") // Si no se especifica un avatar, se asigna uno por defecto
   email                 String                  @unique
   password              String
